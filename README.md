@@ -69,14 +69,4 @@ python authentication.py
 - **Regularly Rotate Keys**: Periodically generate new keys to maintain security.
 - **Monitor Revoked Keys**: Ensure revoked keys are not used accidentally.
 
-## Future Enhancements
-- Implement key expiration policies.
-- Extend support for other encryption algorithms (AES, ECC).
-- Improve key storage with hardware security modules (HSMs).
-
-## License
-This project is licensed under the MIT License.
-
-## Contributors
-- [Your Name] (Replace with your actual name or GitHub profile)
 
