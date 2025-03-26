@@ -1,19 +1,15 @@
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 import os
 
-def encrypt_decrypt_demo():
-    key = os.urandom(32)  # 256-bit key
-    iv = os.urandom(16)  # 128-bit IV
-    message = b"Confidential Data   "  # 16-byte padded
-
+def encrypt_message(message, key):
+    iv = os.urandom(16)
     cipher = Cipher(algorithms.AES(key), modes.CBC(iv))
     encryptor = cipher.encryptor()
-    ciphertext = encryptor.update(message) + encryptor.finalize()
-    print("✅ Encrypted:", ciphertext)
+    padded_message = message + b" " * (16 - len(message) % 16)
+    return iv + encryptor.update(padded_message) + encryptor.finalize()
 
+def decrypt_message(encrypted_data, key):
+    iv, encrypted_message = encrypted_data[:16], encrypted_data[16:]
+    cipher = Cipher(algorithms.AES(key), modes.CBC(iv))
     decryptor = cipher.decryptor()
-    plaintext = decryptor.update(ciphertext) + decryptor.finalize()
-    print("✅ Decrypted:", plaintext)
-
-if __name__ == "__main__":
-    encrypt_decrypt_demo()
+    return decryptor.update(encrypted_message) + decryptor.finalize()

@@ -1,12 +1,11 @@
 from cryptography.hazmat.primitives.asymmetric import dh
+from cryptography.hazmat.primitives import serialization
 
-def perform_key_exchange():
+def generate_dh_parameters():
     parameters = dh.generate_parameters(generator=2, key_size=2048)
-    private_key = parameters.generate_private_key()
-    public_key = private_key.public_key()
-
-    print("✅ Diffie-Hellman Key Exchange Performed!")
-    return private_key, public_key
-
-if __name__ == "__main__":
-    perform_key_exchange()
+    with open("dh_parameters.pem", "wb") as param_file:
+        param_file.write(parameters.parameter_bytes(
+            encoding=serialization.Encoding.PEM,
+            format=serialization.ParameterFormat.PKCS3
+        ))
+    print("✅ Diffie-Hellman Parameters Generated!")

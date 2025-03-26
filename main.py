@@ -1,41 +1,41 @@
 import aes_keygen
 import rsagen
-import key_ex
-import enc_dec
-import authentication
+import certificate_manager
 import krl_manager
 
 def main():
-    print("\n🔹 Secure Key Management System 🔹")
-    print("1. Generate AES Key")
-    print("2. Generate RSA Keys")
-    print("3. Perform Key Exchange")
-    print("4. Encrypt & Decrypt Data")
-    print("5. Sign & Verify Messages")
-    print("6. Revoke Key")
-    print("7. Exit")
+    while True:
+        print("\nSecure Key Management System")
+        print("1. Generate AES Key")
+        print("2. Generate RSA Key Pair")
+        print("3. Generate X.509 Certificate")
+        print("4. Revoke Key")
+        print("5. Check Key Revocation Status")
+        print("6. Remove Key Revocation")
+        print("7. Exit")
 
-    choice = input("Enter your choice: ")
+        choice = input("Enter your choice: ")
 
-    if choice == "1":
-        aes_keygen.generate_aes_key()
-    elif choice == "2":
-        rsagen.generate_and_save_keys()
-    elif choice == "3":
-        key_ex.perform_key_exchange()
-    elif choice == "4":
-        enc_dec.encrypt_decrypt_demo()
-    elif choice == "5":
-        authentication.sign_and_verify()
-    elif choice == "6":
-        key_to_revoke = input("Enter the key filename to revoke: ")
-        krl_manager.revoke_key(key_to_revoke)
-    elif choice == "7":
-        print("Exiting...")
-        exit()
-    else:
-        print("❌ Invalid choice, try again!")
+        if choice == "1":
+            aes_keygen.generate_aes_key()
+        elif choice == "2":
+            rsagen.generate_rsa_keys()
+        elif choice == "3":
+            certificate_manager.generate_x509_certificate()
+        elif choice == "4":
+            key_name = input("Enter key filename to revoke: ")
+            krl_manager.revoke_key(key_name)
+        elif choice == "5":
+            key_name = input("Enter key filename to check: ")
+            status = krl_manager.check_key_status(key_name)
+            print(f"🔒 Key Revoked: {status}")
+        elif choice == "6":
+            key_name = input("Enter key filename to un-revoke: ")
+            krl_manager.remove_key_revocation(key_name)
+        elif choice == "7":
+            break
+        else:
+            print("❌ Invalid Choice!")
 
 if __name__ == "__main__":
-    while True:
-        main()
+    main()
