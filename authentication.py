@@ -1,10 +1,30 @@
+from cryptography import x509
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives import hashes, serialization
 import krl_manager
 
+def verify_certificate():
+    try:
+        with open("certificate.pem", "rb") as cert_file:
+            cert = x509.load_pem_x509_certificate(cert_file.read())
+
+        if cert.not_valid_before <= datetime.datetime.utcnow() <= cert.not_valid_after:
+            print("✅ Certificate is valid!")
+            return True
+        else:
+            print("❌ Certificate expired or not yet valid!")
+            return False
+    except:
+        print("❌ Invalid certificate!")
+        return False
+
 def sign_and_verify():
     if krl_manager.check_key_status("private_key.pem"):
         print("❌ Cannot sign: Private key is revoked!")
+        return
+
+    if not verify_certificate():
+        print("❌ Cannot sign: Certificate invalid!")
         return
 
     with open("private_key.pem", "rb") as priv_file:

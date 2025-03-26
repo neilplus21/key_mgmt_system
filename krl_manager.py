@@ -1,51 +1,44 @@
-import json
+import os
 
-KRL_FILE = "krl.json"
+KRL_FILE = "revoked_keys.txt"
 
-def revoke_key(key_filename):
-    """Revoke a key and store it in the KRL."""
-    try:
-        with open(KRL_FILE, "r") as krl_file:
-            revoked_keys = json.load(krl_file)
-    except (FileNotFoundError, json.JSONDecodeError):
-        revoked_keys = []
+def check_key_status(key_file):
+    """ Check if the key is revoked """
+    if not os.path.exists(KRL_FILE):
+        return False  # No revocations exist yet
 
-    if key_filename not in revoked_keys:
-        revoked_keys.append(key_filename)
-        with open(KRL_FILE, "w") as krl_file:
-            json.dump(revoked_keys, krl_file)
-        print(f"❌ Key '{key_filename}' revoked!")
+    with open(KRL_FILE, "r") as file:
+        revoked_keys = file.read().splitlines()
+
+    return key_file in revoked_keys
+
+def revoke_key(key_file):
+    """ Revoke a key and log it in the KRL file """
+    if not check_key_status(key_file):
+        with open(KRL_FILE, "a") as file:
+            file.write(key_file + "\n")
+        print(f"❌ Key '{key_file}' revoked!")
     else:
-        print(f"⚠️ Key '{key_filename}' is already revoked.")
+        print(f"⚠️ Key '{key_file}' is already revoked.")
 
-def check_key_status(key_filename):
-    """Check if a key is revoked."""
-    try:
-        with open(KRL_FILE, "r") as krl_file:
-            revoked_keys = json.load(krl_file)
-        if key_filename in revoked_keys:
-            print(f"❌ Key '{key_filename}' is revoked!")
-            return True
-    except FileNotFoundError:
-        pass
-    return False
+def remove_key_revocation(key_file):
+    """ Remove a key from the revocation list """
+    if not os.path.exists(KRL_FILE):
+        print("⚠️ No revoked keys found.")
+        return
+    
+    with open(KRL_FILE, "r") as file:
+        revoked_keys = file.read().splitlines()
 
-def remove_key_revocation(key_filename):
-    """Remove a key from the KRL, effectively unrevoking it."""
-    try:
-        with open(KRL_FILE, "r") as krl_file:
-            revoked_keys = json.load(krl_file)
-    except (FileNotFoundError, json.JSONDecodeError):
-        revoked_keys = []
-
-    if key_filename in revoked_keys:
-        revoked_keys.remove(key_filename)
-        with open(KRL_FILE, "w") as krl_file:
-            json.dump(revoked_keys, krl_file)
-        print(f"✅ Key '{key_filename}' removed from revocation list!")
+    if key_file in revoked_keys:
+        revoked_keys.remove(key_file)
+        with open(KRL_FILE, "w") as file:
+            file.write("\n".join(revoked_keys) + "\n")
+        print(f"✅ Key '{key_file}' revocation removed!")
     else:
-        print(f"ℹ️ Key '{key_filename}' was not revoked.")
+        print(f"⚠️ Key '{key_file}' is not revoked.")
 
 if __name__ == "__main__":
-    key_to_revoke = input("Enter the key filename to revoke: ")
-    revoke_key(key_to_revoke)
+    # Example usage
+    revoke_key("private_key.pem")
+    remove_key_revocation("private_key.pem")
