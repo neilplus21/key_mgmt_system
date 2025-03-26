@@ -1,1 +1,4 @@
-["privat1e_key.pem"]
+[
+    "privat1e_key.pem",
+    "private_key.pem"
+]
